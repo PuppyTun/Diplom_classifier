@@ -48,8 +48,8 @@ df_tfidf = pd.DataFrame(title_tfidf.todense(), index=corpus_index, columns=featu
 x = df_tfidf
 y = df.tags
 
-x.index = df.index
-
+# x.index = df.index
+#
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
 
