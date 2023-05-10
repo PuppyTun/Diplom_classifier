@@ -58,5 +58,4 @@ loaded_model = pickle.load(open("SGDClassifier.sav", 'rb'))
 prediction = ['dhrrhdrjjrd rshhsrsr']
 
 pred = loaded_model.predict(tfidf.transform(prediction))
-# print(loaded_model.score(tfidf.transform(prediction), y_test))
 print(dict_tags[pred[0]])
