@@ -97,9 +97,9 @@ class cWindow(QtWidgets.QMainWindow):
 
         if matches:
             msg = QtWidgets.QMessageBox()
-            msg.setWindowTitle('Информация')
-            msg.setText('English!')
-            msg.setDetailedText('English')
+            msg.setWindowTitle('Ошибка')
+            msg.setText('Введите текст на русском языке!')
+            #msg.setDetailedText('')
             msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msg.exec_()
             return
@@ -108,11 +108,10 @@ class cWindow(QtWidgets.QMainWindow):
         n_input_Text = len(input_Text)
         if n_input_Text == 0:
             msg = QtWidgets.QMessageBox()
-            msg.setWindowTitle('Информация')
+            msg.setWindowTitle('Ошибка')
             msg.setText('Исходное сообщение должно содержать ' + \
-                        'хотя бы 1 символ!')
-            msg.setDetailedText('Длина исходного сообщения ' + \
-                                'должна быть больше 0')
+                        'по крайней мере один символ!')
+            #msg.setDetailedText('')
             msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msg.exec_()
             return
