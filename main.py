@@ -32,7 +32,7 @@ def classificator(text):
         sResult = 'Извините, произошла ошибка'
     return sResult
 
-df = pd.read_csv('news_lemmatized.csv')
+df = pd.read_csv('news_lemmatized_2023-05-27_15_56_38.888900.csv')
 
 label_encoder = LabelEncoder()
 corpus_encoded = label_encoder.fit_transform(df.tags)
@@ -76,8 +76,8 @@ x.index = df.index
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
 
-
-loaded_model = pickle.load(open("SGDClassifier.sav", 'rb'))
+# loaded_model = pickle.load(open("SGDClassifier.sav", 'rb'))
+loaded_model = pickle.load(open("LinearSVC_2023-05-27_15_56_38.888900.sav", 'rb'))
 
 class cWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -92,31 +92,61 @@ class cWindow(QtWidgets.QMainWindow):
 
         input_Text = self.ui.TextEdit.toPlainText()
 
-        pattern = re.compile("[A-Za-z]+")
-        matches = pattern.findall(input_Text)
+        input_Text = re.sub(r'[^\w\s-]', '', input_Text)
+        input_Text = input_Text.replace('_', ' ')
+        input_Text = input_Text.replace('-', ' ')
 
-        if matches:
-            msg = QtWidgets.QMessageBox()
-            msg.setWindowTitle('Ошибка')
-            msg.setText('Введите текст на русском языке!')
-            #msg.setDetailedText('')
-            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
-            msg.exec_()
-            return
+        words_text = re.sub(r'[^а-яА-Яa-zA-Z]', ' ', input_Text)
+        words_text = re.sub(r'\s{2,}', ' ', words_text)
 
-
-        n_input_Text = len(input_Text)
-        if n_input_Text == 0:
+        if len(words_text) == 0:
             msg = QtWidgets.QMessageBox()
             msg.setWindowTitle('Ошибка')
             msg.setText('Исходное сообщение должно содержать ' + \
                         'по крайней мере один символ!')
-            #msg.setDetailedText('')
+            # msg.setDetailedText('')
             msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
             msg.exec_()
             return
 
-        sTag = classificator(input_Text)
+        ar_words = words_text.split()
+        ar_english_words = re.findall(r'[a-zA-Z]+', words_text)
+
+        procent_english_words = len(ar_english_words) / (len(ar_words) / 100)
+
+        if (procent_english_words > 50.0):
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle('Ошибка')
+            msg.setText('Введите текст на русском языке!\nВведенный текст в основном на английском.')
+            # msg.setDetailedText('')
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg.exec_()
+            return
+
+        with open('DictionaryRussianWords.txt', 'r', encoding="utf-8") as f:
+            rus_dict_word = f.readlines()
+
+        ar_russian_words = re.findall(r'[а-яА-Я]+', words_text)
+        # ar_rus_words = russian_words.split()
+        count_all_words = len(ar_russian_words)
+        count_find_words = 0
+        for word in ar_russian_words:
+            if (word.lower() + '\n') in rus_dict_word:
+                count_find_words += 1
+
+        procent_true_words = count_find_words / (count_all_words / 100)
+
+        if (procent_true_words < 50.0):
+            msg = QtWidgets.QMessageBox()
+            msg.setWindowTitle('Ошибка')
+            msg.setText('Не удалось распознать слова в тексте!')
+            # msg.setDetailedText('')
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg.exec_()
+            return
+
+        # sTag = classificator(input_Text)
+        sTag = classificator(words_text)
         self.ui.LineEdit.setText(sTag)
         pass
 
